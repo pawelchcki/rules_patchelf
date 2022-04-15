@@ -1,0 +1,35 @@
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("toolchain.bzl", "patchelf_toolchain")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "repositories.bzl",
+    "toolchain.bzl",
+    "patchelf.bzl",
+    "BUILD.patchelf.bazel",
+])
+
+bzl_library(
+    name = "rule_patchelf",
+    srcs = [
+        "patchelf.bzl",
+        "patchelf_library.bzl",
+        "patchelf_print.bzl",
+        "repositories.bzl",
+        "toolchain.bzl",
+    ],
+)
+
+toolchain_type(name = "patchelf_toolchain")
+
+patchelf_toolchain(
+    name = "default_patchelf_toolchain_impl",
+    patchelf = "@nixos_patchelf//:patchelf",
+)
+
+toolchain(
+    name = "default_patchelf_toolchain",
+    toolchain = "default_patchelf_toolchain_impl",
+    toolchain_type = "//patchelf:patchelf_toolchain",
+)

@@ -1,0 +1,57 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("//patchelf:patchelf.bzl", "patchelf_library", "patchelf_print")
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("util.bzl", "test_patchelf_print")
+
+cc_library(
+    name = "lib",
+    srcs = ["lib.c"],
+    hdrs = ["lib.h"],
+)
+
+patchelf_library(
+    name = "lib_patched",
+    args = [
+        "--remove-needed",
+        "libstdc++.so.6",
+    ],
+    lib = ":lib",
+)
+
+cc_binary(
+    name = "compile_with_original",
+    srcs = ["main.c"],
+    deps = [":lib"],
+)
+
+cc_binary(
+    name = "compile_with_patched",
+    srcs = ["main.c"],
+    deps = [":lib_patched"],
+)
+
+test_patchelf_print(
+    name = "prints_library_needed",
+    src = "lib",
+    args = ["--print-needed"],
+)
+
+test_patchelf_print(
+    name = "prints_patched_library_needed",
+    src = "lib_patched",
+    args = ["--print-needed"],
+)
+
+test_patchelf_print(
+    name = "prints_compiled_binary_rpath",
+    src = "compile_with_patched",
+    args = ["--print-rpath"],
+)
+
+build_test(
+    name = "verify_patched_library_links_to_build",
+    targets = [
+        ":compile_with_patched",
+    ],
+)

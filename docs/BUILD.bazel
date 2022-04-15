@@ -1,0 +1,30 @@
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("@io_bazel_stardoc//stardoc:stardoc.bzl",
+     "stardoc")
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+
+bzl_library(
+    name = "starlark_language_rules",
+    srcs = [
+        "@rules_cc//cc:action_names.bzl",
+        "@rules_cc//cc:defs.bzl",
+        "@rules_cc//cc:find_cc_toolchain.bzl",
+        "@rules_cc//cc/private/rules_impl:srcs",
+    ],
+)
+
+stardoc(
+    name = "docs",
+    input = "//patchelf:patchelf.bzl",
+    format = "markdown",
+    header_template = ":readme_header.vm",
+    deps = ["//patchelf:rule_patchelf", ":starlark_language_rules"],
+    out = "README.md",
+)
+
+
+diff_test(
+    name = "README_matches_newly_generated_one",
+    file1 = ":docs",
+    file2 = "//:README.md",
+)

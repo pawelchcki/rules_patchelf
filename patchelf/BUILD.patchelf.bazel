@@ -1,0 +1,10 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "patchelf",
+    srcs = ["src/patchelf.cc"] + [
+        "src/patchelf.h",
+        "src/elf.h",
+    ],
+    copts = ["-std=c++17"],
+)

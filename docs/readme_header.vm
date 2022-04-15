@@ -1,0 +1,3 @@
+# rules_patchelf
+
+Simple set of bazel rules wrapping nixos's patchelf utility
